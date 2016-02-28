@@ -6,9 +6,14 @@ use Moo;
 use LWP::UserAgent;
 use LWP::ConnCache;
 use HTTP::Request::Common;
-use Archive::Zip;
-use IO::String;
+#use Archive::Zip;
+#use IO::String;
 use Apache::Tika::DocInfo;
+use JSON::XS 'decode_json';
+use Data::Dumper;
+
+use vars '$VERSION';
+$VERSION = '0.01';
 
 # We should use AnyEvent::HTTP, to nicely integrate with other event loops
 # Or Promises, to do that.
@@ -82,10 +87,12 @@ sub url {
         # Unfortunately, Tika returns the metadata as invalid HTTP headers
         # which HTTP::Header does not like. So we fetch all information
         # as the zip archive:
-        text => 'all',
+        #text => 'all',
+        text => 'rmeta',
         test => 'tika', # but GET instead of PUT
-        meta => 'meta',
-        all => 'all',
+        meta => 'rmeta',
+        #all => 'all',
+        all => 'rmeta',
         # unpack
     }->{ $type };
     
@@ -95,7 +102,7 @@ sub url {
         $url
 };
 
-# /meta
+# /rmeta
 # /unpacker
 # /all
 # /tika
@@ -132,19 +139,23 @@ sub fetch {
         $self->ua->$method( $url, @content);
     my $info;
     if( 'all' eq $options{ type } or 'text' eq $options{ type } ) {
-        my $fh= IO::String->new( $res->content );
-        my $ar= Archive::Zip->new();
-        $ar->readFromFileHandle( $fh );
+        my $payload = decode_json( $res->content );
+        #use Data::Dumper;
+        #warn Dumper $payload->[0];
+        my $item = $payload->[0];
 
         # Should/could this be lazy?
+        my $c = delete $item->{'X-TIKA:content'};
+        warn Dumper $item;
         $info= Apache::Tika::DocInfo->new({
-            meta => +{ $self->decode_csv( $ar->contents('__METADATA__') ) },
-            content => scalar $ar->contents('__TEXT__'),
+            content => $c,
+            meta => $item,
         });
     } else {
         # Must be '/meta'
+        #warn $res->as_string;
         $info= Apache::Tika::DocInfo->new(
-            meta => +{ $self->decode_csv( $res->content ) },
+            rmeta => +{ decode_json( $res->content ) },
             content => undef,
         );
     };

@@ -3,6 +3,9 @@ use strict;
 use Moo;
 use JSON::XS qw(decode_json);
 
+use vars '$VERSION';
+$VERSION = '0.01';
+
 has java => (
     is => 'rw',
     #isa => 'Str',
