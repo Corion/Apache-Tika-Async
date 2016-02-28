@@ -3,6 +3,7 @@ use strict;
 use Apache::Tika::Server;
 
 use Data::Dumper;
+
 my $tika= Apache::Tika::Server->new(
     #java => '"C:/Program Files (x86)/Java/jre7/bin/java.exe"',
 );

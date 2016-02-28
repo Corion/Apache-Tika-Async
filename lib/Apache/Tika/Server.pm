@@ -12,6 +12,21 @@ use Apache::Tika::DocInfo;
 use JSON::XS 'decode_json';
 use Data::Dumper;
 
+=head1 SYNOPSIS
+
+    use Apache::Tika::Server;
+
+    my $tika= Apache::Tika::Server->new();
+    $tika->launch();
+
+    my $fn= shift;
+
+    use Data::Dumper;
+    print Dumper $tika->get_meta($fn);
+    print Dumper $tika->get_text($fn);
+
+=cut
+
 use vars '$VERSION';
 $VERSION = '0.01';
 
@@ -34,19 +49,6 @@ has port => (
 has fh => (
     is => 'rw',
     #isa => 'Array',
-);
-
-has '+jarfile' => (
-    is => 'rw',
-    #isa => 'Str',
-    #default => 'jar/tika-server-1.5-20130816.014724-18.jar',
-    default => sub {
-        # Do a natural sort on the dot-version
-        (sort { my $ad; $a =~ /server-1.(\d+)/ and $ad=$1;
-                my $bd; $b =~ /server-1.(\d+)/ and $bd=$1;
-                $bd <=> $ad
-              } glob 'jar/tika-server-*.jar')[0]
-    },
 );
 
 has ua => (
