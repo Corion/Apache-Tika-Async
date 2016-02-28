@@ -53,18 +53,21 @@ sub fetch {
 sub decode_csv {
     my( $self, $line )= @_;
     $line =~ m!"([^"]+)"!g;
-}
+}
+
 sub get_meta {
     my( $self, $file )= @_;
     #return decode_json($self->fetch( filename => $file, type => 'meta' ));
     # Hacky CSV-to-hash decode :-/
     return $self->fetch( filename => $file, type => 'meta' );
 };
-sub get_text {
+
+sub get_text {
     my( $self, $file )= @_;
     return $self->fetch( filename => $file, type => 'text' );
 };
-sub get_test {
+
+sub get_test {
     my( $self, $file )= @_;
     return $self->fetch( filename => $file, type => 'test' );
 };
