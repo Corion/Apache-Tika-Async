@@ -80,7 +80,7 @@ sub get_meta {
     my( $self, $file )= @_;
     #return decode_json($self->fetch( filename => $file, type => 'meta' ));
     # Hacky CSV-to-hash decode :-/
-    return $self->fetch( filename => $file, type => 'meta' );
+    return $self->fetch( filename => $file, type => 'meta' )->meta;
 };
 
 sub get_text {

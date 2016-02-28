@@ -7,11 +7,11 @@ use Data::Dumper;
 my $tika= Apache::Tika::Server->new(
     #java => '"C:/Program Files (x86)/Java/jre7/bin/java.exe"',
 );
-#my $tika= Apache::Tika->new;
 $tika->launch();
+#my $tika= Apache::Tika->new;
 
 my $fn= shift;
 
-#print Dumper $tika->get_meta($fn);
+print "Content-Type: " . $tika->get_meta($fn)->{'Content-Type'} . "\n";
 
-print Dumper $tika->get_text($fn)->content;
+print $tika->get_text($fn)->content;

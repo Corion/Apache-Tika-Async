@@ -134,7 +134,8 @@ sub fetch {
         ;
     };
     my @content= $content
-               ? ('Content' => $content, "Content-Length" => $content_size, "Content-Type" => 'application/pdf', )
+               ? ('Accept' => 'application/json','Content' => $content, "Content-Length" => $content_size, #"Content-Type" => 'application/pdf',
+                 )
                : ();
     
     my $res=
@@ -148,18 +149,21 @@ sub fetch {
 
         # Should/could this be lazy?
         my $c = delete $item->{'X-TIKA:content'};
-        warn Dumper $item;
         $info= Apache::Tika::DocInfo->new({
             content => $c,
             meta => $item,
         });
     } else {
         # Must be '/meta'
+        my $payload = decode_json( $res->content );
+        my $item = $payload->[0];
+
+        my $c = delete $item->{'X-TIKA:content'};
         #warn $res->as_string;
-        $info= Apache::Tika::DocInfo->new(
-            rmeta => +{ decode_json( $res->content ) },
+        $info= Apache::Tika::DocInfo->new({
+            meta => $item,
             content => undef,
-        );
+        });
     };
     $info
 }
