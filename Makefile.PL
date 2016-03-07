@@ -6,12 +6,18 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.012', # Well, that's what the source code says
     META_MERGE => {
         resources => {
-            #repository => "http://www.thenautilus.net/cgit/feeder",
+            repository => 'https://github.com/Corion/apache-tika',
         },
     },
     BUILD_REQUIRES => {
         'Exporter'   => '5',    # we need the "import" facility
         'Carp'       => '0',
+
+        # Fairly long in core
+        'File::Path' => 0,
+        'File::Copy' => 0,
+        'File::Find' => 0,
+        'File::Basename' => 0,
     },
     'NAME' => 'Apache::Tika',
     'LICENSE' => 'perl',
@@ -22,6 +28,5 @@ WriteMakefile(
         'LWP::UserAgent' => 6,
         'Moo' => 0,
         'JSON::XS' => 0,
-        'HTTP::Request::Common' => 0,
     },
 );
