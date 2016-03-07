@@ -177,7 +177,6 @@ sub fetch {
             
             if( $item->{"Content-Type"} and $item->{"Content-Type"} =~ m!^text/plain\b!) {
                 # Also strip the enclosing <p>..</p>
-                warn "[[$c]]";
                 $c =~ s!\A\s*<p>(.*)\s*</p>\s*\z!$1!s;
             };
         } else {
