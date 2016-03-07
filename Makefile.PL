@@ -15,7 +15,6 @@ WriteMakefile(
     },
     'NAME' => 'Apache::Tika',
     'LICENSE' => 'perl',
-    'VERSION' => '0.1',
     'PREREQ_PM' => {
         'LWP::UserAgent' => 6,
         'Carp' => 0,
