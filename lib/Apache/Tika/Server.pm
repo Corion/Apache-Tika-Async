@@ -152,9 +152,22 @@ sub fetch {
         #use Data::Dumper;
         #warn Dumper $payload->[0];
         my $item = $payload->[0];
-
+        
         # Should/could this be lazy?
         my $c = delete $item->{'X-TIKA:content'};
+        # Ghetto-strip HTML we don't want:
+        if( $c =~ m!<body>(.*)</body>!s ) {
+            $c = $1;
+            
+            if( $item->{"Content-Type"} and $item->{"Content-Type"} =~ m!^text/plain\b!) {
+                # Also strip the enclosing <p>..</p>
+                warn "[[$c]]";
+                $c =~ s!\A\s*<p>(.*)\s*</p>\s*\z!$1!s;
+            };
+        } else {
+            warn "Couldn't find body in response";
+        };
+        
         $info= Apache::Tika::DocInfo->new({
             content => $c,
             meta => $item,
