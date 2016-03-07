@@ -6,11 +6,13 @@ use Moo;
 use LWP::UserAgent;
 use LWP::ConnCache;
 use HTTP::Request::Common;
-#use Archive::Zip;
-#use IO::String;
 use Apache::Tika::DocInfo;
 use JSON::XS 'decode_json';
 use Data::Dumper;
+use Promises;
+
+use Apache::Tika::Connection::AEHTTP;
+#use Apache::Tika::Connection::LWP;
 
 =head1 SYNOPSIS
 
@@ -51,10 +53,16 @@ has fh => (
     #isa => 'Array',
 );
 
+has connection_class => (
+    is => 'ro',
+    default => 'Apache::Tika::Connection::AEHTTP',
+);
+
 has ua => (
     is => 'rw',
     #isa => 'Str',
-    default => sub { my $ua= LWP::UserAgent->new(); $ua->conn_cache( LWP::ConnCache->new ); $ua },
+    default => sub { $_[0]->connection_class->new },
+    #default => sub { Apache::Tika::Connection::LWP->new },
 );
 
 sub cmdline {
@@ -86,10 +94,6 @@ sub url {
     $type||= 'text';
     
     my $url= {
-        # Unfortunately, Tika returns the metadata as invalid HTTP headers
-        # which HTTP::Header does not like. So we fetch all information
-        # as the zip archive:
-        #text => 'all',
         text => 'rmeta',
         test => 'tika', # but GET instead of PUT
         meta => 'rmeta',
@@ -99,9 +103,25 @@ sub url {
     }->{ $type };
     
     sprintf
-        'http://localhost:%s/%s',
+        'http://127.0.0.1:%s/%s',
         $self->port,
         $url
+};
+
+
+sub synchronous($) {
+    my $promise = $_[0];
+    my @res;
+    if( $promise->is_unfulfilled ) {
+        my $await = AnyEvent->condvar;
+        $promise->then(sub{ $await->send(@_)});
+        @res = $await->recv;
+    } else {
+        #use Data::Dumper;
+        #warn Dumper $promise->result;
+        @res = @{ $promise->result }
+    }
+    @res
 };
 
 # /rmeta
@@ -133,22 +153,16 @@ sub fetch {
         $method= 'put';# , "Content-Length" => $content_size, #Content => $content
         ;
     };
-    my @content= $content
-               ? ('Content' => $content, "Content-Length" => $content_size, "Content-Type" => 'application/pdf', )
-               : ();
     
-    my $res=
-        $self->ua->$method( $url, @content);
+    my ($code,$res) = synchronous
+        $self->ua->request( $method, $url, $content );
     my $info;
     if( 'all' eq $options{ type } or 'text' eq $options{ type } ) {
-        my $payload = decode_json( $res->content );
-        #use Data::Dumper;
-        #warn Dumper $payload->[0];
-        my $item = $payload->[0];
+        my $item = $res->[0];
 
         # Should/could this be lazy?
         my $c = delete $item->{'X-TIKA:content'};
-        warn Dumper $item;
+        #warn Dumper $item;
         $info= Apache::Tika::DocInfo->new({
             content => $c,
             meta => $item,
@@ -157,7 +171,7 @@ sub fetch {
         # Must be '/meta'
         #warn $res->as_string;
         $info= Apache::Tika::DocInfo->new(
-            rmeta => +{ decode_json( $res->content ) },
+            rmeta => $res,
             content => undef,
         );
     };
