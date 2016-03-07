@@ -113,6 +113,7 @@ sub url {
 # /unpacker
 # /all
 # /tika
+# /language
 #    hello world
 sub fetch {
     my( $self, %options )= @_;
@@ -134,6 +135,7 @@ sub fetch {
     my $method;
     if( 'test' eq $options{ type } ) {
         $method= 'get';
+
     } else {
         $method= 'put';# , "Content-Length" => $content_size, #Content => $content
         ;
@@ -148,6 +150,9 @@ sub fetch {
         $self->ua->$method( $url, @content);
     my $info;
     if( 'all' eq $options{ type } or 'text' eq $options{ type } ) {
+        if( $res->is_error ) {
+            croak $res->as_string
+        };
         my $payload = decode_json( $res->content );
         #use Data::Dumper;
         #warn Dumper $payload->[0];
