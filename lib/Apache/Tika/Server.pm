@@ -139,7 +139,6 @@ sub fetch {
     my $url= $self->url( $options{ type } );
     
     my $content= $options{ content };
-    my $content_size;
     if(! $content and $options{ filename }) {
         # read $options{ filename }
         open my $fh, '<', $options{ filename }
@@ -147,7 +146,6 @@ sub fetch {
         binmode $fh;
         local $/;
         $content = <$fh>;
-        $content_size= length $content;
     };
     
     my $method;
@@ -155,19 +153,17 @@ sub fetch {
         $method= 'get';
 
     } else {
-        $method= 'put';# , "Content-Length" => $content_size, #Content => $content
+        $method= 'put';
         ;
     };
     # 'text/plain' for the language
-    my @content= $content
-               ? ('Accept' => 'application/json,text/plain', 'Content' => $content, "Content-Length" => $content_size, #"Content-Type" => 'application/pdf',
-                 )
-               : ();
     
     my ($code,$res) = synchronous
         $self->ua->request( $method, $url, $content );
     my $info;
-    if( 'all' eq $options{ type } or 'text' eq $options{ type } ) {
+    if(    'all' eq $options{ type }
+        or 'text' eq $options{ type }
+        or 'meta' eq $options{ type } ) {
         if( $code !~ /^2..$/ ) {
             croak "Got HTTP error code $code";
         };
@@ -200,18 +196,19 @@ sub fetch {
         };
         
     } else {
-        # Must be '/meta' or '/language'
-        my ($payload, $item);
-        if( $res->{"Content-Type"} eq 'application/json' ) {
-            $item = $res->[0];
+        # Must be '/language'
+        if( $code !~ /^2..$/ ) {
+            croak "Got HTTP error code $code";
+        };
+        if( ref $res ) {
+            $res = $res->[0];
         } else {
-            $item = { info => $res };
+            $res = { info => $res };
         };
 
-        my $c = delete $item->{'X-TIKA:content'};
-        # Must be '/meta'
+        my $c = delete $res->{'X-TIKA:content'};
         $info= Apache::Tika::DocInfo->new({
-            rmeta => $res,
+            meta => $res,
             content => undef,
         });
     };

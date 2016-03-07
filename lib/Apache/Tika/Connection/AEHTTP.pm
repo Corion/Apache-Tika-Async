@@ -38,7 +38,6 @@ sub request {
                     $headers                      # headers
                 );
                 
-                warn "Got $response (" . (0+@$response) . ")";
                 $p->resolve( $code, $response );
             }
             catch {

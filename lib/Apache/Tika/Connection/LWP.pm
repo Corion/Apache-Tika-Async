@@ -13,20 +13,17 @@ has ua => (
 );
 
 sub request {
-    my( $self, $method, $url, $content, @content ) = @_;
+    my( $self, $method, $url, $content ) = @_;
     # Should initialize
     
     my $content_size = length $content;
     
-    my @content= $content
+    my %headers= $content
                ? ('Content' => $content,
                   "Content-Length" => $content_size,
                   )
                : ();
-    warn "[[$url]]";
-    my $res = $self->ua->$method( $url, @content);
-    
-    print $res->as_string;
+    my $res = $self->ua->$method( $url, %headers);
     
     my $p = deferred;
     my ( $code, $response ) = $self->process_response(
