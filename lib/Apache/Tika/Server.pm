@@ -24,6 +24,10 @@ use Data::Dumper;
     use Data::Dumper;
     print Dumper $tika->get_meta($fn);
     print Dumper $tika->get_text($fn);
+    print Dumper $tika->get_language($fn);
+
+    my $info = $tika->get_all($fn);
+    print Dumper $info->meta;
 
 =cut
 
@@ -94,6 +98,7 @@ sub url {
         test => 'tika', # but GET instead of PUT
         meta => 'rmeta',
         #all => 'all',
+        language => 'language/string',
         all => 'rmeta',
         # unpack
     }->{ $type };
@@ -133,8 +138,9 @@ sub fetch {
         $method= 'put';# , "Content-Length" => $content_size, #Content => $content
         ;
     };
+    # 'text/plain' for the language
     my @content= $content
-               ? ('Accept' => 'application/json','Content' => $content, "Content-Length" => $content_size, #"Content-Type" => 'application/pdf',
+               ? ('Accept' => 'application/json,text/plain', 'Content' => $content, "Content-Length" => $content_size, #"Content-Type" => 'application/pdf',
                  )
                : ();
     
@@ -153,13 +159,24 @@ sub fetch {
             content => $c,
             meta => $item,
         });
+        
+        if( ! defined $info->{meta}->{"meta:language"} ) {
+            # Yay. Two requests.
+            my $lang_meta = $self->fetch(%options, type => 'language');
+            $info->{meta}->{"meta:language"} = $lang_meta->meta->{"info"};
+        };
+        
     } else {
-        # Must be '/meta'
-        my $payload = decode_json( $res->content );
-        my $item = $payload->[0];
+        # Must be '/meta' or '/language'
+        my ($payload, $item);
+        if( $res->content_type eq 'application/json' ) {
+            $payload = decode_json( $res->content );
+            $item = $payload->[0];
+        } else {
+            $item = { info => $res->content };
+        };
 
         my $c = delete $item->{'X-TIKA:content'};
-        #warn $res->as_string;
         $info= Apache::Tika::DocInfo->new({
             meta => $item,
             content => undef,

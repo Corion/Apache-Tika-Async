@@ -98,6 +98,11 @@ sub get_all {
     return $self->fetch( filename => $file, type => 'all' );
 };
 
+sub get_language {
+    my( $self, $file )= @_;
+    return $self->fetch( filename => $file, type => 'language' );
+};
+
 __PACKAGE__->meta->make_immutable;
 
 1;
