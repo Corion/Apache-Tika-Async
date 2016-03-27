@@ -3,7 +3,7 @@ use AnyEvent::HTTP qw(http_request);
 use Promises qw(deferred);
 use Try::Tiny;
 use Moo;
-with 'CORION::Apache::Tika::Connection';
+with 'Apache::Tika::Connection';
 
 use vars '$VERSION';
 $VERSION = '0.05';
@@ -66,8 +66,8 @@ L<https://perlmonks.org/>.
 =head1 BUG TRACKER
 
 Please report bugs in this module via the RT CPAN bug queue at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=CORION-Apache-Tika>
-or via mail to L<corion-apache-tika-Bugs@rt.cpan.org>.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Apache-Tika-Async>
+or via mail to L<apache-tika-async-Bugs@rt.cpan.org>.
 
 =head1 AUTHOR
 

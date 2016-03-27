@@ -3,7 +3,6 @@ use strict;
 use Carp qw(croak);
 # Fire up/stop a Tika instance
 use Moo;
-use HTTP::Request::Common;
 use Apache::Tika::DocInfo;
 use Data::Dumper;
 use Promises;
@@ -235,8 +234,8 @@ L<https://perlmonks.org/>.
 =head1 BUG TRACKER
 
 Please report bugs in this module via the RT CPAN bug queue at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=CORION-Apache-Tika>
-or via mail to L<corion-apache-tika-Bugs@rt.cpan.org>.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Apache-Tika-Async>
+or via mail to L<apache-tika-async-Bugs@rt.cpan.org>.
 
 =head1 AUTHOR
 
