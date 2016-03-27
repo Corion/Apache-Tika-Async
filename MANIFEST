@@ -1,5 +1,6 @@
 .gitignore
 bin/script.pl
+Changes
 lib/Apache/Tika/Async.pm
 lib/Apache/Tika/Connection.pm
 lib/Apache/Tika/Connection/AEHTTP.pm
@@ -9,6 +10,7 @@ lib/Apache/Tika/Server.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+t/00-load.t
 xt/99-changes.t
 xt/99-compile.t
 xt/99-manifest.t
