@@ -8,7 +8,7 @@ $VERSION = '0.05';
 
 =head1 NAME
 
-Apache::Tika::Async - connect to Apache::Tika
+Apache::Tika::Async - connect to Apache Tika
 
 =head1 SYNOPSIS
 

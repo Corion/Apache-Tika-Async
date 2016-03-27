@@ -19,7 +19,7 @@ WriteMakefile(
         'File::Find' => 0,
         'File::Basename' => 0,
     },
-    'NAME' => 'Apache::Tika',
+    'NAME' => 'Apache::Tika::Async',
     'LICENSE' => 'perl',
     'PREREQ_PM' => {
         'Carp' => 0,
