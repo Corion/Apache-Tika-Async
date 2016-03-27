@@ -4,6 +4,10 @@ use ExtUtils::MakeMaker qw(WriteMakefile);
 
 WriteMakefile(
     MIN_PERL_VERSION => '5.012', # Well, that's what the source code says
+    NAME                => 'Apache::Tika::Async',
+    AUTHOR              => q{Max Maischein <corion@cpan.org>},
+    VERSION_FROM        => 'lib/Apache/Tika/Async.pm',
+    ABSTRACT_FROM       => 'lib/Apache/Tika/Async.pm',
     META_MERGE => {
         resources => {
             repository => 'https://github.com/Corion/apache-tika',
