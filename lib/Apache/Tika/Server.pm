@@ -12,6 +12,7 @@ use Promises;
 
     use Apache::Tika::Server;
 
+    # Launch our own Apache Tika instance
     my $tika= Apache::Tika::Server->new();
     $tika->launch();
 
@@ -28,12 +29,9 @@ use Promises;
 =cut
 
 use vars '$VERSION';
-$VERSION = '0.01';
+$VERSION = '0.05';
 
-# We should use AnyEvent::HTTP, to nicely integrate with other event loops
-# Or Promises, to do that.
-
-extends 'Apache::Tika';
+extends 'Apache::Tika::Async';
 
 sub load_module {
     my( $module ) = @_;
@@ -92,7 +90,7 @@ sub launch {
 }
 
 sub url {
-    # XXX Should return URI instead
+    # Should return URI instead
     my( $self, $type )= @_;
     $type||= 'text';
     
@@ -156,10 +154,11 @@ sub fetch {
         $method= 'put';
         ;
     };
-    # 'text/plain' for the language
+    
+    my $headers = $options{ headers } || {};
     
     my ($code,$res) = synchronous
-        $self->ua->request( $method, $url, $content );
+        $self->ua->request( $method, $url, $content, %$headers );
     my $info;
     if(    'all' eq $options{ type }
         or 'text' eq $options{ type }
@@ -180,7 +179,7 @@ sub fetch {
                 $c =~ s!\A\s*<p>(.*)\s*</p>\s*\z!$1!s;
             };
         } else {
-            warn "Couldn't find body in response";
+            warn "Couldn't find HTML body in response";
         };
         
         $info= Apache::Tika::DocInfo->new({
@@ -190,7 +189,7 @@ sub fetch {
         
         if( ! defined $info->{meta}->{"meta:language"} ) {
             # Yay. Two requests.
-            my $lang_meta = $self->fetch(%options, type => 'language');
+            my $lang_meta = $self->fetch(%options, type => 'language', 'Content-Type' => $item->{'Content-Type'});
             $info->{meta}->{"meta:language"} = $lang_meta->meta->{"info"};
         };
         
@@ -222,3 +221,33 @@ sub DEMOLISH {
 __PACKAGE__->meta->make_immutable;
 
 1;
+
+=head1 REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/apache-tika>.
+
+=head1 SUPPORT
+
+The public support forum of this module is
+L<https://perlmonks.org/>.
+
+=head1 BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=CORION-Apache-Tika>
+or via mail to L<corion-apache-tika-Bugs@rt.cpan.org>.
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+=head1 COPYRIGHT (c)
+
+Copyright 2014-2016 by Max Maischein C<corion@cpan.org>.
+
+=head1 LICENSE
+
+This module is released under the same terms as Perl itself.
+
+=cut
