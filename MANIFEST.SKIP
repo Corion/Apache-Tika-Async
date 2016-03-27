@@ -22,3 +22,5 @@ Makefile$
 ^.*.zip$
 ^tika.cmd$
 ^.releaserc
+^Apache-Tika-Async.*.tar.gz$
+^Apache-Tika-Async.*/
