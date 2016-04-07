@@ -135,14 +135,13 @@ sub fetch {
     $options{ type }||= 'text';
     my $url= $self->url( $options{ type } );
     
-    my $content= $options{ content };
-    if(! $content and $options{ filename }) {
+    if(! $options{ content } and $options{ filename }) {
         # read $options{ filename }
         open my $fh, '<', $options{ filename }
             or croak "Couldn't read '$options{ filename }': $!";
         binmode $fh;
         local $/;
-        $content = <$fh>;
+        $options{ content } = <$fh>;
     };
     
     my $method;
