@@ -169,7 +169,7 @@ sub fetch {
         # Should/could this be lazy?
         my $c = delete $item->{'X-TIKA:content'};
         # Ghetto-strip HTML we don't want:
-        if( $c =~ m!<body>(.*)</body>!s ) {
+        if( $c =~ m!<body>(.*)</body>!s or $c =~ m!<body\s*/>!) {
             $c = $1;
             
             if( $item->{"Content-Type"} and $item->{"Content-Type"} =~ m!^text/plain\b!) {
@@ -177,7 +177,7 @@ sub fetch {
                 $c =~ s!\A\s*<p>(.*)\s*</p>\s*\z!$1!s;
             };
         } else {
-            warn "Couldn't find HTML body in response";
+            warn "Couldn't find HTML body in response: $c";
         };
         
         $info= Apache::Tika::DocInfo->new({
