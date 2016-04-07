@@ -110,7 +110,7 @@ sub url {
 };
 
 
-sub synchronous($) {
+sub await($) {
     my $promise = $_[0];
     my @res;
     if( $promise->is_unfulfilled ) {
@@ -156,8 +156,8 @@ sub fetch {
     
     my $headers = $options{ headers } || {};
     
-    my ($code,$res) = synchronous
-        $self->ua->request( $method, $url, $content, %$headers );
+    my ($code,$res) = await
+        $self->ua->request( $method, $url, $options{ content }, %$headers );
     my $info;
     if(    'all' eq $options{ type }
         or 'text' eq $options{ type }
