@@ -50,7 +50,10 @@ has 'jarfile' => (
 has java_args => (
     is => 'rw',
     #isa => 'Array',
-    builder => sub { [] },
+    builder => sub { [
+        # So that Tika can re-read some problematic PDF files better
+        '-Dorg.apache.pdfbox.baseParser.pushBackSize=1000000'
+    ] },
 );
 
 has tika_args => (
