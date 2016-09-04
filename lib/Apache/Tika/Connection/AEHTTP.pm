@@ -26,6 +26,7 @@ sub request {
     my $p = deferred;
     http_request(
         $method => $url,
+        persistent => 1,
         headers => \%headers,
         body => $content,
         sub {
