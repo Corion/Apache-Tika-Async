@@ -5,12 +5,10 @@ $VERSION = '0.06';
 
 has meta => (
     is => 'ro',
-    #isa => 'Hash',
 );
 
 has content => (
     is => 'ro',
-    #isa => 'Int',
 );
 
 1;
