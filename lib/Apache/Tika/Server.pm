@@ -164,7 +164,7 @@ sub fetch {
         or 'text' eq $options{ type }
         or 'meta' eq $options{ type } ) {
         if( $code !~ /^2..$/ ) {
-            croak "Got HTTP error code $code";
+            croak "Got HTTP error code $code for '$options{ filename }'";
         };
         my $item = $res->[0];
         
