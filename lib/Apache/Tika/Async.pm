@@ -14,13 +14,17 @@ Apache::Tika::Async - connect to Apache Tika
 
     use Apache::Tika::Async;
 
-    my $tika= Apache::Tika::Server->new;
+    my $tika= Apache::Tika::Async->new;
 
     my $fn= shift;
 
     use Data::Dumper;
-    print Dumper $tika->get_meta($fn);
-    print Dumper $tika->get_text($fn);
+    my $info = $tika->get_all( $fn );
+    print Dumper $info->meta($fn);
+    print $info->content($fn);
+    # <html><body>...
+    print $info->meta->{"meta:language"};
+    # en
 
 =cut
 

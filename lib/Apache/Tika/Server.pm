@@ -12,18 +12,20 @@ use Promises;
     use Apache::Tika::Server;
 
     # Launch our own Apache Tika instance
-    my $tika= Apache::Tika::Server->new();
-    $tika->launch();
+    my $tika= Apache::Tika::Server->new(
+        jarfile => $tika_path,
+    );
+    $tika->launch;
 
     my $fn= shift;
 
     use Data::Dumper;
-    print Dumper $tika->get_meta($fn);
-    print Dumper $tika->get_text($fn);
-    print Dumper $tika->get_language($fn);
-
-    my $info = $tika->get_all($fn);
-    print Dumper $info->meta;
+    my $info = $tika->get_all( $fn );
+    print Dumper $info->meta($fn);
+    print $info->content($fn);
+    # <html><body>...
+    print $info->meta->{"meta:language"};
+    # en
 
 =cut
 
