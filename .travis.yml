@@ -49,6 +49,7 @@ before_install:
 install:
   - cpan-install ExtUtils::MakeMaker~6.68
   - cpan-install --deps
+  - cpan-install AnyEvent::HTTP # optional
 
 script:
   - cd $BUILD_DIR
