@@ -52,12 +52,13 @@ my %module = (
 
     PREREQ_PM => {
         'Exporter'         => 5, # for 'import'
-        'Carp' => 0,
-        'Exporter' => 5,
-        'Promises' => 0,
+        'Carp'           => 0,
+        'Exporter'       => 5,
+        'Promises'       => 0,
         'LWP::UserAgent' => 6,
-        'Moo' => 2,
-        'JSON::XS' => 0,
+        'Moo'            => 2,
+        'Try::Tiny'      => 0,
+        'JSON::XS'       => 0,
     },
     TEST_REQUIRES => { # all core anyway...
         'Test::More'   => 0,
