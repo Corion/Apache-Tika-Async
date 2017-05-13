@@ -1,6 +1,6 @@
 package Apache::Tika::Async;
 use strict;
-use Moo;
+use Moo 2;
 use JSON::XS qw(decode_json);
 
 use vars '$VERSION';

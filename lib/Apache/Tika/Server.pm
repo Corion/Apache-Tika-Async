@@ -2,7 +2,7 @@ package Apache::Tika::Server;
 use strict;
 use Carp qw(croak);
 # Fire up/stop a Tika instance
-use Moo;
+use Moo 2;
 use Apache::Tika::DocInfo;
 use Data::Dumper;
 use Promises;
