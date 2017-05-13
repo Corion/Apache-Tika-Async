@@ -1,0 +1,71 @@
+language: perl
+perl:
+  # Selenium::Remote::Driver needs Perl 5.10
+  #- "5.6.2"       # ancient
+  #- "5.8"
+  #- "5.8.4"
+  #- "5.8.4-thr"
+  #- "5.8.8"       # common, prebuilt version
+  #- "5.10"
+  - "5.12"
+  - "5.14"
+  - "5.16"
+  - "5.18"
+  - "5.18.1-thr"
+  - "5.20"
+  - "5.22"
+  - "5.24"
+  - "dev"
+  - "blead"
+
+matrix:
+  allow_failures:
+    - perl: blead
+    - perl: 5.6.2
+
+sudo: false
+
+#addons:
+#  apt:
+#    packages:
+#      - oracle-java8-installer
+
+cache:
+  directories:
+    - "$HOME/tika"
+
+before_install:
+  #- apt-get install java
+  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
+  - export SPLIT_BUILD=0
+  - source ~/travis-perl-helpers/init
+  - build-perl
+  - perl -V
+  - build-dist
+  - export REPODIR=$(pwd)
+  - cd $BUILD_DIR
+  - chmod ugo+x $REPODIR/travis-scripts/download.sh && $REPODIR/travis-scripts/download.sh
+
+install:
+  - cpan-install ExtUtils::MakeMaker~6.68
+  - cpan-install --deps
+
+script:
+  - cd $BUILD_DIR
+  - perl Makefile.PL && make
+  - prove -blv $(test-dirs)
+
+branches:
+  except:
+    - /^wip\//
+    - /^blocked/
+#notifications:
+#  email: false
+#  irc:
+#    channels:
+#      - "irc.perl.org#moo-smoke"
+#    template:
+#      - "%{repository}#%{build_number} %{branch} by %{author}: %{message} (%{build_url})"
+#    on_success: change
+#    on_failure: always
+#    skip_join: true
