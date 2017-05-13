@@ -6,7 +6,7 @@ use Moo;
 with 'Apache::Tika::Connection';
 
 use vars '$VERSION';
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 sub request {
     my( $self, $method, $url, $content, @headers ) = @_;
