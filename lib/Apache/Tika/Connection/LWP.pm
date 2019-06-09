@@ -3,7 +3,7 @@ use LWP::UserAgent;
 use LWP::ConnCache;
 use Promises qw(deferred);
 use Try::Tiny;
-use Moo;
+use Moo 2;
 with 'Apache::Tika::Connection';
 
 use vars '$VERSION';
