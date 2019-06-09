@@ -7,6 +7,10 @@ use Apache::Tika::DocInfo;
 use Data::Dumper;
 use Promises;
 
+use Filter::signatures;
+use feature 'signatures';
+no warnings 'experimental::signatures';
+
 =head1 SYNOPSIS
 
     use Apache::Tika::Server;

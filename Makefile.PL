@@ -51,9 +51,9 @@ my %module = (
     },
 
     PREREQ_PM => {
-        'Exporter'         => 5, # for 'import'
+        'Exporter'           => 5, # for 'import'
+        'Filter::signatures' => 0.15,
         'Carp'           => 0,
-        'Exporter'       => 5,
         'Promises'       => 0,
         'LWP::UserAgent' => 6,
         'Moo'            => 2,
