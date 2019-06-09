@@ -5,8 +5,7 @@ use Try::Tiny;
 use Moo;
 with 'Apache::Tika::Connection';
 
-use vars '$VERSION';
-$VERSION = '0.07';
+our $VERSION = '0.07';
 
 sub request {
     my( $self, $method, $url, $content, @headers ) = @_;

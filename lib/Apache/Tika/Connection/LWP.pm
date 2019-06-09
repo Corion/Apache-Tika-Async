@@ -6,8 +6,7 @@ use Try::Tiny;
 use Moo 2;
 with 'Apache::Tika::Connection';
 
-use vars '$VERSION';
-$VERSION = '0.07';
+our $VERSION = '0.07';
 
 has ua => (
     is => 'ro',
