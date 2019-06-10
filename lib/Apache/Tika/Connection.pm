@@ -39,7 +39,7 @@ sub process_response {
 =head1 REPOSITORY
 
 The public repository of this module is
-L<https://github.com/Corion/apache-tika>.
+L<https://github.com/Corion/Apache-Tika-Async>.
 
 =head1 SUPPORT
 
