@@ -33,7 +33,7 @@ no warnings 'experimental::signatures';
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 extends 'Apache::Tika::Async';
 

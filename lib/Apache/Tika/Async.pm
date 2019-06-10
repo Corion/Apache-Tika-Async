@@ -3,7 +3,7 @@ use strict;
 use Moo 2;
 use JSON::XS qw(decode_json);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
