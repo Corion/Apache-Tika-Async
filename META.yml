@@ -3,8 +3,7 @@ abstract: 'connect to Apache Tika'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
-  Carp: '0'
-  Exporter: '5'
+  Data::Dumper: '0'
   File::Basename: '0'
   File::Copy: '0'
   File::Find: '0'
