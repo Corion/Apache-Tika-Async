@@ -5,21 +5,21 @@ use Try::Tiny;
 use Moo;
 with 'Apache::Tika::Connection';
 
-use vars '$VERSION';
-$VERSION = '0.07';
+our $VERSION = '0.07';
 
 sub request {
     my( $self, $method, $url, $content, @headers ) = @_;
     # Should initialize
-    
+
     $method = uc $method;
-    
+
     my $content_size = length $content;
-    
+
     # 'text/plain' for the language
     my %headers= (
                   "Content-Length" => $content_size,
-                  "Accept" => 'application/json,text/plain',
+                  "Accept"         => 'application/json,text/plain',
+                  'Content-Type'   => 'application/octet-stream',
                   @headers
                  );
 
@@ -40,7 +40,7 @@ sub request {
                     $body,                        # body
                     $headers                      # headers
                 );
-                
+
                 $p->resolve( $code, $response );
             }
             catch {

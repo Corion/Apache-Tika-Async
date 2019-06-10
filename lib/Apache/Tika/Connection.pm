@@ -2,18 +2,17 @@ package Apache::Tika::Connection;
 use strict;
 use Moo::Role;
 use JSON::XS;
-use vars qw($VERSION);
-$VERSION = '0.07';
+our $VERSION = '0.07';
 
 sub decode_response {
     my( $self, $body ) = @_;
-    
+
     return decode_json( $body );
 }
 
 sub process_response {
     my ( $self, $params, $code, $msg, $body, $headers ) = @_;
-    
+
     my $mime_type = $headers->{"content-type"};
 
     my $is_encoded = $mime_type && $mime_type !~ m!^text/plain\b!;
