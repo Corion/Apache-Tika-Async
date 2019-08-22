@@ -25,7 +25,7 @@ Apache::Tika::Async - connect to Apache Tika
 # REPOSITORY
 
 The public repository of this module is
-[https://github.com/Corion/apache-tika](https://github.com/Corion/apache-tika).
+[https://github.com/Corion/Apache-Tika-Async](https://github.com/Corion/Apache-Tika-Async).
 
 # SUPPORT
 
