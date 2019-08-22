@@ -46,6 +46,7 @@ my %module = (
         'File::Copy' => 0,
         'File::Find' => 0,
         'File::Basename' => 0,
+        'ExtUtils::MakeMaker' => 0,
     },
 
     PREREQ_PM => {
