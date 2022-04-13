@@ -198,7 +198,6 @@ sub fetch {
             croak "Got HTTP error code $code for '$options{ filename }'";
         };
         my $item = $res->[0];
-
         # Should/could this be lazy?
         my $c = delete $item->{'X-TIKA:content'};
         # Ghetto-strip HTML we don't want:
