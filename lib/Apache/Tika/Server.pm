@@ -136,6 +136,7 @@ sub url {
         # unpack
     }->{ $type };
 
+    # XXX this won't work with IPv6 localhost?!
     sprintf
         'http://127.0.0.1:%s/%s',
         $self->port,
