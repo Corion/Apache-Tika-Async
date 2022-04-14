@@ -4,7 +4,7 @@ use Carp qw(croak);
 use Moo 2;
 use Apache::Tika::DocInfo;
 use Data::Dumper;
-use Promises;
+use Future;
 
 use Filter::signatures;
 use feature 'signatures';

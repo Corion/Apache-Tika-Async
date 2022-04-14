@@ -1,7 +1,7 @@
 package Apache::Tika::Connection::LWP;
 use LWP::UserAgent;
 use LWP::ConnCache;
-use Promises qw(deferred);
+use Future;
 use Try::Tiny;
 use Moo 2;
 with 'Apache::Tika::Connection';

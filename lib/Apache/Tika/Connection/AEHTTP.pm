@@ -1,6 +1,6 @@
 package Apache::Tika::Connection::AEHTTP;
 use AnyEvent::HTTP qw(http_request);
-use Promises qw(deferred);
+use Future;
 use Try::Tiny;
 use Moo;
 with 'Apache::Tika::Connection';
