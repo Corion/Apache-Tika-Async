@@ -36,13 +36,13 @@ has java => (
 has 'jarfile' => (
     is => 'rw',
     #isa => 'Str',
-    #default => 'jar/tika-server-1.5-20130816.014724-18.jar',
+# tika-server-1.24.1.jar
+# tika-server-standard-2.3.0.jar
+
     default => sub {
-        # Do a natural sort on the dot-version
-        (sort { my $ad; $a =~ /server-1.(\d+)/ and $ad=$1;
-                my $bd; $b =~ /server-1.(\d+)/ and $bd=$1;
-                $bd <=> $ad
-              } glob 'jar/tika-server-*.jar')[0]
+        __PACKAGE__->best_jar_file(
+              glob 'jar/tika-server-*.jar'
+        );
     },
 );
 
@@ -60,6 +60,15 @@ has tika_args => (
     #isa => 'Array',
     default => sub { [ ] },
 );
+
+sub best_jar_file {
+    my( $package, @files ) = @_;
+    # Do a natural sort on the dot-version
+    (sort { my $ad; $a =~ /\bserver-(?:standard-|)(\d+)\.(\d+)/ and $ad=sprintf '%02d.%04d', $1, $2;
+            my $bd; $b =~ /\bserver-(?:standard-|)(\d+)\.(\d+)/ and $bd=sprintf '%02d.%04d', $1, $2;
+                $bd <=> $ad
+          } @files)[0]
+}
 
 sub cmdline {
     my( $self )= @_;
