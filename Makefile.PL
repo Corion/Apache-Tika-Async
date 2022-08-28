@@ -37,7 +37,7 @@ my %module = (
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.012',
+    MIN_PERL_VERSION => '5.020', # signatures, syntax amenities
 
     'LICENSE'=> 'perl',
 
@@ -53,7 +53,7 @@ my %module = (
 
     PREREQ_PM => {
         'Exporter'           => '5',    # we need the "import" facility
-        'Filter::signatures' => 0.15,
+        # 'Filter::signatures' => 0.15, # we require 5.020 anyway
         'Carp'           => 0,
         'Future'         => 0,
         'LWP::UserAgent' => 6,
