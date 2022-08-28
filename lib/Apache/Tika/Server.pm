@@ -5,6 +5,9 @@ use Moo 2;
 use Apache::Tika::DocInfo;
 use Data::Dumper;
 use Future;
+# Consider if we really want/need it, instead of simply staying
+# callback-based
+#use Future::AsyncAwait;
 
 use Filter::signatures;
 use feature 'signatures';
@@ -59,7 +62,7 @@ has port => (
 
 has connection_class => (
     is => 'ro',
-    default => 'Apache::Tika::Connection::AEHTTP',
+    default => 'Apache::Tika::Connection::Future',
 );
 
 has ua => (
@@ -146,21 +149,6 @@ sub url {
         $url
 };
 
-
-sub await($) {
-    my $promise = $_[0];
-    my @res;
-    if( $promise->is_unfulfilled ) {
-        require AnyEvent;
-        my $await = AnyEvent->condvar;
-        $promise->then(sub{ $await->send(@_)});
-        @res = $await->recv;
-    } else {
-        @res = @{ $promise->result }
-    }
-    @res
-};
-
 # /rmeta
 # /unpacker
 # /all
@@ -192,59 +180,62 @@ sub fetch {
 
     my $headers = $options{ headers } || {};
 
-    my ($code,$res) = await
-        $self->ua->request( $method, $url, $options{ content }, %$headers );
-    my $info;
-    if(    'all' eq $options{ type }
-        or 'text' eq $options{ type }
-        or 'meta' eq $options{ type } ) {
-        if( $code !~ /^2..$/ ) {
-            croak "Got HTTP error code $code for '$options{ filename }'";
-        };
-        my $item = $res->[0];
-        # Should/could this be lazy?
-        my $c = delete $item->{'X-TIKA:content'};
-        # Ghetto-strip HTML we don't want:
-        if( $c =~ m!<body>(.*)</body>!s or $c =~ m!<body\s*/>!) {
-            $c = $1;
-
-            if( $item->{"Content-Type"} and $item->{"Content-Type"} =~ m!^text/plain\b!) {
-                # Also strip the enclosing <p>..</p>
-                $c =~ s!\A\s*<p>(.*)\s*</p>\s*\z!$1!s;
+    #my ($code,$res) = await
+    #    $self->ua->request( $method, $url, $options{ content }, %$headers );
+    return $self->ua->request( $method, $url, $options{ content }, %$headers )
+    ->then(sub( $code, $res ) {
+        my $info;
+        if(    'all' eq $options{ type }
+            or 'text' eq $options{ type }
+            or 'meta' eq $options{ type } ) {
+            if( $code !~ /^2..$/ ) {
+                croak "Got HTTP error code $code for '$options{ filename }'";
             };
+            my $item = $res->[0];
+            # Should/could this be lazy?
+            my $c = delete $item->{'X-TIKA:content'};
+            # Ghetto-strip HTML we don't want:
+            if( $c =~ m!<body>(.*)</body>!s or $c =~ m!<body\s*/>!) {
+                $c = $1;
+
+                if( $item->{"Content-Type"} and $item->{"Content-Type"} =~ m!^text/plain\b!) {
+                    # Also strip the enclosing <p>..</p>
+                    $c =~ s!\A\s*<p>(.*)\s*</p>\s*\z!$1!s;
+                };
+            } else {
+                warn "Couldn't find HTML body in response: $c";
+            };
+
+            $info= Apache::Tika::DocInfo->new({
+                content => $c,
+                meta => $item,
+            });
+
+            if( ! defined $info->{meta}->{"meta:language"} ) {
+                # Yay. Two requests.
+                my $lang_meta = $self->fetch(%options, type => 'language', 'Content-Type' => $item->{'Content-Type'})->get;
+                $info->{meta}->{"meta:language"} = $lang_meta->meta->{"info"};
+            };
+
         } else {
-            warn "Couldn't find HTML body in response: $c";
-        };
+            # Must be '/language'
+            if( $code !~ /^2..$/ ) {
+                croak "Got HTTP error code $code";
+            };
+            if( ref $res ) {
+                $res = $res->[0];
+            } else {
+                $res = { info => $res };
+            };
 
-        $info= Apache::Tika::DocInfo->new({
-            content => $c,
-            meta => $item,
-        });
-
-        if( ! defined $info->{meta}->{"meta:language"} ) {
-            # Yay. Two requests.
-            my $lang_meta = $self->fetch(%options, type => 'language', 'Content-Type' => $item->{'Content-Type'});
-            $info->{meta}->{"meta:language"} = $lang_meta->meta->{"info"};
+            my $c = delete $res->{'X-TIKA:content'};
+            $info= Apache::Tika::DocInfo->new({
+                meta => $res,
+                content => undef,
+            });
         };
-
-    } else {
-        # Must be '/language'
-        if( $code !~ /^2..$/ ) {
-            croak "Got HTTP error code $code";
-        };
-        if( ref $res ) {
-            $res = $res->[0];
-        } else {
-            $res = { info => $res };
-        };
-
-        my $c = delete $res->{'X-TIKA:content'};
-        $info= Apache::Tika::DocInfo->new({
-            meta => $res,
-            content => undef,
-        });
-    };
-    $info
+        return Future->done($info)
+    })
 }
 
 sub DEMOLISH {
@@ -252,7 +243,7 @@ sub DEMOLISH {
         if( $_[0] and $_[0]->pid );
 }
 
-__PACKAGE__->meta->make_immutable;
+#__PACKAGE__->meta->make_immutable;
 
 1;
 

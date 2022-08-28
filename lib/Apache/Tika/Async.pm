@@ -99,30 +99,36 @@ sub get_meta {
     my( $self, $file )= @_;
     #return decode_json($self->fetch( filename => $file, type => 'meta' ));
     # Hacky CSV-to-hash decode :-/
-    return $self->fetch( filename => $file, type => 'meta' )->meta;
+    return $self->fetch( filename => $file, type => 'meta' )->meta->get;
 };
 
 sub get_text {
     my( $self, $file )= @_;
-    return $self->fetch( filename => $file, type => 'text' );
+    return $self->fetch( filename => $file, type => 'text' )->get;
 };
 
 sub get_test {
     my( $self, $file )= @_;
-    return $self->fetch( filename => $file, type => 'test' );
+    return $self->fetch( filename => $file, type => 'test' )->get;
 };
 
 sub get_all {
     my( $self, $file )= @_;
-    return $self->fetch( filename => $file, type => 'all' );
+    return $self->fetch( filename => $file, type => 'all' )->get;
 };
 
 sub get_language {
     my( $self, $file )= @_;
-    return $self->fetch( filename => $file, type => 'language' );
+    return $self->fetch( filename => $file, type => 'language' )->get;
 };
 
-__PACKAGE__->meta->make_immutable;
+# ->detect_stream wants not a file but the input bytes
+# sub detect_stream {
+#     my( $self, $file )= @_;
+#     return $self->fetch( filename => $file, type => 'all' )->get;
+# };
+
+# __PACKAGE__->meta->make_immutable;
 
 1;
 

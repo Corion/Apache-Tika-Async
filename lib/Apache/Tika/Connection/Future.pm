@@ -1,50 +1,53 @@
-package Apache::Tika::Connection::LWP;
-use LWP::UserAgent;
-use LWP::ConnCache;
-use Future;
-use Try::Tiny;
-use Moo 2;
+package Apache::Tika::Connection::Future;
+use 5.020;
+use Future::HTTP;
+use Moo;
 with 'Apache::Tika::Connection';
+
+use Filter::signatures;
+use feature 'signatures';
+no warnings 'experimental::signatures';
 
 our $VERSION = '0.08';
 
 has ua => (
     is => 'ro',
     default => sub {
-        my $ua = LWP::UserAgent->new();
-        $ua->conn_cache( LWP::ConnCache->new );
-
-        $ua
+        return Future::HTTP->new()
     },
 );
 
-sub request {
-    my( $self, $method, $url, $content, @headers ) = @_;
+sub request( $self, $method, $url, $content, @headers ) {
+    # Should initialize
+
+    $method = uc $method;
 
     my $content_size = length $content;
-    my @content = $content ? (Content => $content) : ();
 
     # 'text/plain' for the language
     my %headers= (
                   "Content-Length" => $content_size,
                   "Accept"         => 'application/json,text/plain',
                   'Content-Type'   => 'application/octet-stream',
-                  @headers,
-                  @content,
+                  @headers
                  );
-    my $res = $self->ua->$method( $url, %headers);
 
-    my $p = deferred;
-    my ( $code, $response ) = $self->process_response(
-        $res->request,                     # request
-        $res->code,                        # code
-        $res->message,                     # msg
-        $res->decoded_content,             # body
-        $res->headers                      # headers
-    );
-    $p->resolve( $code, $response );
-
-    $p->promise
+    $self->ua->http_request(
+        $method => $url,
+        persistent => 1,
+        headers => \%headers,
+        body => $content,
+    )->then(sub( $body, $headers ) {
+        # The headers might be invalid!
+        my ( $code, $response ) = $self->process_response(
+            undef,                        # request
+            delete $headers->{Status},    # code
+            delete $headers->{Reason},    # msg
+            $body,                        # body
+            $headers                      # headers
+        );
+        Future->done( $code, $response )
+    });
 }
 
 1;
