@@ -1,7 +1,6 @@
 package Apache::Tika::Server;
 use strict;
 use Carp qw(croak);
-# Fire up/stop a Tika instance
 use Moo 2;
 use Apache::Tika::DocInfo;
 use Data::Dumper;
@@ -11,25 +10,29 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
+=head1 NAME
+
+Apache::Tika::Server - Fire up/stop a Tika instance
+
 =head1 SYNOPSIS
 
-    use Apache::Tika::Server;
+  use Apache::Tika::Server;
 
-    # Launch our own Apache Tika instance
-    my $tika= Apache::Tika::Server->new(
-        jarfile => $tika_path,
-    );
-    $tika->launch;
+  # Launch our own Apache Tika instance
+  my $tika= Apache::Tika::Server->new(
+      jarfile => $tika_path,
+  );
+  $tika->launch;
 
-    my $fn= shift;
+  my $fn= shift;
 
-    use Data::Dumper;
-    my $info = $tika->get_all( $fn );
-    print Dumper $info->meta($fn);
-    print $info->content($fn);
-    # <html><body>...
-    print $info->meta->{"meta:language"};
-    # en
+  use Data::Dumper;
+  my $info = $tika->get_all( $fn );
+  print Dumper $info->meta($fn);
+  print $info->content($fn);
+  # <html><body>...
+  print $info->meta->{"meta:language"};
+  # en
 
 =cut
 
