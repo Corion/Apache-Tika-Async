@@ -2,6 +2,7 @@ package Apache::Tika::Async;
 use strict;
 use Moo 2;
 use JSON::XS qw(decode_json);
+use File::Temp 'tempfile';
 
 our $VERSION = '0.08';
 
@@ -11,19 +12,19 @@ Apache::Tika::Async - connect to Apache Tika
 
 =head1 SYNOPSIS
 
-    use Apache::Tika::Async;
+  use Apache::Tika::Async;
 
-    my $tika= Apache::Tika::Async->new;
+  my $tika= Apache::Tika::Async->new;
 
-    my $fn= shift;
+  my $fn= shift;
 
-    use Data::Dumper;
-    my $info = $tika->get_all( $fn );
-    print Dumper $info->meta($fn);
-    print $info->content($fn);
-    # <html><body>...
-    print $info->meta->{"meta:language"};
-    # en
+  use Data::Dumper;
+  my $info = $tika->get_all( $fn );
+  print Dumper $info->meta($fn);
+  print $info->content($fn);
+  # <html><body>...
+  print $info->meta->{"meta:language"};
+  # en
 
 =cut
 
@@ -61,6 +62,39 @@ has tika_args => (
     default => sub { [ ] },
 );
 
+sub _tika_config_xml {
+    my( $self, %entries ) = @_;
+    return join '',
+'<?xml version="1.0" encoding="UTF-8"?>',
+'<properties>',
+'<!-- <parsers etc.../> -->',
+'<server>',
+    '<params>',
+    (map { join '', "<$_>" => $entries{ $_ } => "</$_>" } sort keys %entries),
+    '</params>',
+'</server>',
+'</properties>',
+}
+
+sub tika_config {
+    my( $self, %entries ) = @_;
+    return $self->_tika_config_xml(
+        logLevel => $self->loglevel,
+        %entries
+    );
+}
+
+sub tika_config_temp_file {
+    my( $self, %entries ) = @_;
+
+    my( $fh, $name ) = tempfile();
+    binmode $fh;
+    print {$fh} $self->tika_config(%entries);
+    close $fh;
+
+    return $name;
+}
+
 sub best_jar_file {
     my( $package, @files ) = @_;
     # Do a natural sort on the dot-version
@@ -76,6 +110,7 @@ sub cmdline {
     @{$self->java_args},
     '-jar',
     $self->jarfile,
+    '--config', $self->tika_config_temp_file,
     @{$self->tika_args},
 };
 
@@ -85,9 +120,9 @@ sub fetch {
     push @cmd, $options{ type };
     push @cmd, $options{ filename };
     @cmd= map { qq{"$_"} } @cmd;
-    die "Fetching from local process is currently disabled";
+    #die "Fetching from local process is currently disabled";
     #warn "[@cmd]";
-    ''.`@cmd`
+    '' . readpipe(@cmd)
 }
 
 sub decode_csv {

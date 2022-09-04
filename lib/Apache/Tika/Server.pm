@@ -86,6 +86,7 @@ sub cmdline {
     '-jar',
     $self->jarfile,
     #'--port', $self->port,
+    '--config', $self->tika_config_temp_file,
     @{$self->tika_args},
 };
 
