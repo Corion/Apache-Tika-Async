@@ -4,7 +4,7 @@ use Moo 2;
 use JSON::XS qw(decode_json);
 use File::Temp 'tempfile';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
