@@ -68,6 +68,12 @@ has port => (
     default => sub { 9998 },
 );
 
+has loglevel => (
+    is => 'ro',
+    #isa => 'Int',
+    default => sub { 'info' },
+);
+
 has connection_class => (
     is => 'ro',
     default => 'Apache::Tika::Connection::Future',
