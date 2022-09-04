@@ -54,6 +54,14 @@ has pid => (
     #isa => 'Int',
 );
 
+has host => (
+    is => 'ro',
+
+    # this should be 127.0.0.1 or [::1] , depending on whether we
+    # are IPv4 or IPv6 ...
+    default => sub { 'localhost' },
+);
+
 has port => (
     is => 'ro',
     #isa => 'Int',
@@ -142,9 +150,9 @@ sub url {
         # unpack
     }->{ $type };
 
-    # XXX this won't work with IPv6 localhost?!
     sprintf
-        'http://127.0.0.1:%s/%s',
+        'http://%s:%s/%s',
+        $self->host,
         $self->port,
         $url
 };
