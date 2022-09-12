@@ -38,11 +38,6 @@ Sets the Tika Jarfile to be used. The default is to look
 in the directory C<jar/> below the current directory.
 
 =cut
-has java => (
-    is => 'rw',
-    #isa => 'Str',
-    default => 'java',
-);
 
 has 'jarfile' => (
     is => 'rw',
@@ -58,6 +53,43 @@ has 'jarfile' => (
     },
 );
 
+=head2 B<tika_args>
+
+  tika_args => [],
+
+Additional Tika command line options.
+
+=cut
+
+
+has tika_args => (
+    is => 'rw',
+    #isa => 'Array',
+    default => sub { [ ] },
+);
+
+=head2 B<java>
+
+  java => '/opt/openjdk-11-jre/bin/java',
+
+Sets the Java executable to be used.
+
+=cut
+
+has java => (
+    is => 'rw',
+    #isa => 'Str',
+    default => 'java',
+);
+
+=head2 B<java_args>
+
+  java_args => [],
+
+Sets the Java options to be used.
+
+=cut
+
 has java_args => (
     is => 'rw',
     #isa => 'Array',
@@ -65,12 +97,6 @@ has java_args => (
         # So that Tika can re-read some problematic PDF files better
         '-Dorg.apache.pdfbox.baseParser.pushBackSize=1000000'
     ] },
-);
-
-has tika_args => (
-    is => 'rw',
-    #isa => 'Array',
-    default => sub { [ ] },
 );
 
 sub _tika_config_xml {
