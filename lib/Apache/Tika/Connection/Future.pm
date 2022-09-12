@@ -4,7 +4,7 @@ use Future::HTTP;
 use Moo;
 with 'Apache::Tika::Connection';
 
-use Filter::signatures;
+#use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 

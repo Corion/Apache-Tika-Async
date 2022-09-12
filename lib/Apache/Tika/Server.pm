@@ -9,7 +9,7 @@ use Future;
 # callback-based
 #use Future::AsyncAwait;
 
-use Filter::signatures;
+#use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
