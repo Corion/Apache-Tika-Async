@@ -39,8 +39,8 @@
             "Carp" : "0",
             "Exporter" : "5",
             "Future" : "0",
+            "Future::HTTP" : "0",
             "JSON::XS" : "0",
-            "LWP::UserAgent" : "6",
             "Moo" : "2",
             "Try::Tiny" : "0",
             "perl" : "5.020"
