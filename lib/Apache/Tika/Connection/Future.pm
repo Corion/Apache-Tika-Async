@@ -8,7 +8,7 @@ with 'Apache::Tika::Connection';
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 has ua => (
     is => 'ro',

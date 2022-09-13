@@ -39,7 +39,7 @@ Apache::Tika::Server - Fire up/stop a Tika instance
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 extends 'Apache::Tika::Async';
 
