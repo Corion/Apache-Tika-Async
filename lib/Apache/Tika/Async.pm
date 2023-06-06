@@ -214,6 +214,11 @@ C<PERL_APACHE_TIKA_PATH> environment variable.
 The public repository of this module is
 L<https://github.com/Corion/Apache-Tika-Async>.
 
+=head1 SEE ALSO
+
+Tabula - for extracting tables:
+L<https://github.com/tabulapdf/tabula-java>
+
 =head1 SUPPORT
 
 The public support forum of this module is
