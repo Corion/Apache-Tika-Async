@@ -85,8 +85,8 @@ has ua => (
     default => sub { load_module( $_[0]->connection_class ); $_[0]->connection_class->new },
 );
 
-sub cmdline {
-    my( $self )= @_;
+around 'cmdline' => sub {
+    my( $orig, $self )= @_;
     $self->java,
     @{$self->java_args},
     '-jar',
@@ -113,11 +113,13 @@ sub spawn_child_posix( $self, @cmd ) {
     # We are the child, close about everything, then exec
     chdir("/")                  || die "can't chdir to /: $!";
     (setsid() != -1)            || die "Can't start a new session: $!";
-    open(STDERR, ">&STDOUT")    || die "can't dup stdout: $!";
-    open(STDIN,  "< /dev/null") || die "can't read /dev/null: $!";
-    open(STDOUT, "> /dev/null") || die "can't write to /dev/null: $!";
-    exec @cmd;
-    exit 1;
+
+    open(STDERR, ">", "/dev/null") || die "can't close stderr: $!";
+    open(STDIN,  "<", "/dev/null") || die "can't read /dev/null: $!";
+    open(STDOUT, ">", "/dev/null") || die "can't write to /dev/null: $!";
+
+    exec { $cmd[0] } @cmd
+        or exit 1;
 }
 
 sub spawn_child( $self, @cmd ) {
@@ -134,7 +136,6 @@ sub spawn_child( $self, @cmd ) {
 sub launch( $self ) {
     if( !$self->pid ) {
         my $cmdline= join " ", $self->cmdline; # well, for Windows...
-        #warn $cmdline;
         my $pid= $self->spawn_child( $self->cmdline )
             or croak "Couldn't launch [$cmdline]: $!/$^E";
         $self->pid( $pid );

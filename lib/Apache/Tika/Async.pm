@@ -95,7 +95,7 @@ has java_args => (
     #isa => 'Array',
     builder => sub { [
         # So that Tika can re-read some problematic PDF files better
-        '-Dorg.apache.pdfbox.baseParser.pushBackSize=1000000'
+        '-Dorg.apache.pdfbox.baseParser.pushBackSize=1000000',
     ] },
 );
 
