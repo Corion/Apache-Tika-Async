@@ -186,7 +186,8 @@ sub get_test {
 
 sub get_all {
     my( $self, $file )= @_;
-    return $self->fetch( filename => $file, type => 'all' )->get;
+    return $self->fetch( filename => $file, type => 'rmeta' )->get;
+    #return $self->fetch( filename => $file, type => 'all' )->get;
 };
 
 sub get_language {

@@ -20,11 +20,14 @@ sub process_response {
     # Request is successful
 
     if ( $code >= 200 and $code <= 209 ) {
-        if ( defined $body and length $body ) {
+        if ( defined $body and length $body and $mime_type eq 'text/json') {
             # Let's hope it's JSON
             $body = $self->decode_response($body)
                 if $is_encoded;
             return $code, $body;
+
+        } elsif( defined $body and length $body ) {
+            return $code, $body
         }
         return ( $code, 1 ) if $params->{method} eq 'HEAD';
         return ( $code, '' );

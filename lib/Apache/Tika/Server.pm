@@ -5,6 +5,8 @@ use Moo 2;
 use Apache::Tika::DocInfo;
 use Data::Dumper;
 use Future;
+use Archive::Zip;
+
 # Consider if we really want/need it, instead of simply staying
 # callback-based
 #use Future::AsyncAwait;
@@ -152,21 +154,32 @@ sub url {
         text => 'rmeta',
         test => 'tika', # but GET instead of PUT
         meta => 'rmeta',
+        rmeta => 'rmeta',
         #all => 'all',
         language => 'language/string',
         all => 'rmeta',
-        # unpack
+        unpack => 'unpack/all',
     }->{ $type };
 
-    sprintf
+    return sprintf
         'http://%s:%s/%s',
         $self->host,
         $self->port,
         $url
 };
 
+sub get_unpack( $self, $file ) {
+    return $self->fetch( filename => $file, type => 'unpack',
+        headers => {
+            "X-Tika-PDFextractInlineImages" => 'true',
+            "Expect" => '100-continue',
+            "Accept" => '*/*',
+        }
+    )->get;
+}
+
 # /rmeta
-# /unpacker
+# /unpack
 # /all
 # /tika
 # /language
@@ -191,22 +204,31 @@ sub fetch {
 
     } else {
         $method= 'put';
-        ;
+        # we could also always use POST and multipart/form-data to circumvent PUT problems?!
     };
 
     my $headers = $options{ headers } || {};
 
-    #my ($code,$res) = await
-    #    $self->ua->request( $method, $url, $options{ content }, %$headers );
     return $self->ua->request( $method, $url, $options{ content }, %$headers )
     ->then(sub( $code, $res ) {
         my $info;
         if(    'all' eq $options{ type }
             or 'text' eq $options{ type }
+            or 'rmeta' eq $options{ type } # well, untested...
             or 'meta' eq $options{ type } ) {
             if( $code !~ /^2..$/ ) {
                 croak "Got HTTP error code $code for '$options{ filename }'";
             };
+
+            #if( @$res > 1 ) {
+            #
+            #    # can/should we get the embedded images with /unpack/all?!
+            #
+            #    use Data::Dumper;
+            #    warn Dumper $res;
+            #    die;
+            #}
+
             my $item = $res->[0];
             # Should/could this be lazy?
             my $c = delete $item->{'X-TIKA:content'};
@@ -229,9 +251,18 @@ sub fetch {
 
             if( ! defined $info->{meta}->{"meta:language"} ) {
                 # Yay. Two requests.
+                # Also, the language operates on a _string_ not on the file!
                 my $lang_meta = $self->fetch(%options, type => 'language', 'Content-Type' => $item->{'Content-Type'})->get;
                 $info->{meta}->{"meta:language"} = $lang_meta->meta->{"info"};
             };
+
+        } elsif( 'unpack' eq $options{ type }) {
+
+            open my $fh, '<', \$res;
+            require Archive::Zip;
+            my $zip = Archive::Zip->new();
+            $zip->readFromFileHandle( $fh );
+            $info = $zip;
 
         } else {
             # Must be '/language'
