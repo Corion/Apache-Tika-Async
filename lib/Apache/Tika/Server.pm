@@ -208,7 +208,6 @@ sub fetch {
     };
 
     my $headers = $options{ headers } || {};
-
     return $self->ua->request( $method, $url, $options{ content }, %$headers )
     ->then(sub( $code, $res ) {
         my $info;
